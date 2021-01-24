@@ -1,0 +1,29 @@
+version: '3.5'
+
+services:
+  mysql:
+    image: mysql:5.6
+    container_name: mysql-pep
+    environment:
+      MYSQL_ROOT_PASSWORD: 'admin'
+      MYSQL_DATABASE: 'pep'
+    ports:
+      - '3307:3306'
+    volumes:
+      - ./db/migrations/:/docker-entrypoint-initdb.d
+      - mysql:/var/lib/mysql
+    networks:
+      - api-network
+
+  adminer:
+    image: adminer
+    ports:
+      - 8081:8080
+    networks:
+      - api-network
+
+volumes:
+  mysql:
+
+networks:
+  api-network:

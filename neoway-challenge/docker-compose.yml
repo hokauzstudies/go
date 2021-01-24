@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  app:
+    container_name: app
+    build:
+      context: . # Use an image built from the specified dockerfile in the current directory.
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASS=admin123
+      - DB_NAME=neoway_challenge
+    restart: unless-stopped
+    depends_on:
+      # workaround to make sure the app will wait until pgsql is ready
+      - pgadmin
+
+  postgres:
+    container_name: postgres
+    image: postgres:11.7-alpine
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin123
+      - POSTGRES_DB=neoway_challenge
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@pg.com"
+      PGADMIN_DEFAULT_PASSWORD: "pgadmin"
+      PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: 50 # disable low level logs from pgadmin
+    ports:
+      - "16543:80"
+    depends_on:
+      - postgres
+
+volumes:
+  db-data:
